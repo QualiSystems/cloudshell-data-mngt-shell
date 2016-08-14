@@ -1,9 +1,20 @@
 from cloudshell.shell.core.resource_driver_interface import ResourceDriverInterface
-from cloudshell.shell.core.driver_context import InitCommandContext, ResourceCommandContext, AutoLoadCommandContext, \
-    AutoLoadAttribute, AutoLoadResource, AutoLoadDetails
+from cloudshell.shell.core.context import InitCommandContext, ResourceCommandContext
+from cloudshell.api.cloudshell_api import CloudShellAPISession
+from cloudshell.api.common_cloudshell_api import CloudShellAPIError
+from auxiliary import SafeCloudShellAPISession
+import time
 
 
-class CloudshellDataMngtShellDriver (ResourceDriverInterface):
+
+class QaTestingScriptsDriver (ResourceDriverInterface):
+
+    def cleanup(self):
+        """
+        Destroy the driver session, this function is called everytime a driver instance is destroyed
+        This is a good place to close any open sessions, finish writing to log files
+        """
+        pass
 
     def __init__(self):
         """
@@ -17,166 +28,232 @@ class CloudshellDataMngtShellDriver (ResourceDriverInterface):
         This is a good place to load and cache the driver configuration, initiate sessions etc.
         :param InitCommandContext context: the context the command runs on
         """
+
         pass
 
-    def example_function(self, context):
-        """
-        A simple example function
+
+    def CreateTopologyWithNApps(self,context,n, topology_name, app_name):
+
+        # cast input to appropriate type
+        n = int(n)
+
+        api_session = self._api_session(context)
+        res_id = api_session.CreateImmediateReservation('Apps', api_session.username, 5).Reservation.Id
+        for i in range(n):
+            api_session.AddAppToReservation(res_id, str(app_name))
+        api_session.SaveReservationAsTopology(res_id, '', str(topology_name))
+        api_session.EndReservation(res_id)
+        return topology_name
+
+    def RemoveAllResources(self,context,res_id):
+        api_session = self._api_session(context)
+        reservation = api_session.GetReservationDetails(res_id).ReservationDescription
+        for resource in reservation.Resources:
+            api_session.RemoveResourcesFromReservation(res_id, [resource.Name])
+
+    def KillAllReservations(self,context):
+        api_session =self._api_session(context)
+        current = api_session.GetCurrentReservations(api_session.username)
+        current_reservation_id = context.reservation.reservation_id
+        if len(current.Reservations) == 0:
+            return 'there were no live reservations'
+        else:
+            for res in current.Reservations:
+                if res.Id != current_reservation_id:
+                    api_session.EndReservation(res.Id)
+            return 'Killed %d resevations' % len(current.Reservations)
+
+    def CreateConnectedBridges(self,context,numberBridges=2, numberPorts=10, folderName='Bridges', panelName='The Panel',
+                               bridgeName='Bridge', override=False):
+
+        # cast input to appropriate type
+        numberBridges = int(numberBridges)
+        numberPorts = int (numberPorts)
+        override = override == 'True'
+
+        api_session = self._api_session(context)
+        safe_session = self._safe_session(context)
+        session = api_session
+        if override:
+            test = False
+            for item in api_session.GetFolderContent().ContentArray:
+                if item.Name == folderName and item.Type == 'Folder':
+                    test = True
+                    break
+            if test:
+                api_session.DeleteFolder(folderName)
+        else:
+            session = safe_session
+
+        api_session.CreateFolder(folderName)
+        panel = session.CreateResource('PatchPanel', 'Generic PatchPanel', resourceName=panelName,
+                                       resourceAddress='Panelia', folderFullPath=folderName)
+        api_session.UpdateResourceDriver(panel.Name, 'Patch Panel Driver')
+        for i in range(numberBridges):
+            bridge = session.CreateResource('Bridge', 'Bridge Generic Model', resourceName=bridgeName + str(i + 1),
+                                            resourceAddress='Brigerabia ' + str(i + 1), folderFullPath=folderName)
+            for j in range(numberPorts):
+                num = numberPorts * i + j + 1
+                port = api_session.CreateResource('Bridge Port', 'Bridge Port Generic Model', 'Port' + str(j),
+                                                  'Brigeportia ' + str(num), folderName, bridge.Name)
+                jack = api_session.CreateResource('Panel Jack', 'Generic Jack', 'Jack' + str(num),
+                                                  'Jackville ' + str(num),
+                                                  folderName, panel.Name)
+                api_session.UpdatePhysicalConnection(port.Name, jack.Name)
+
+    def CreateUsers(self,context):
+
+        api_session = self._api_session(context)
+        Westcost = {'Odd Future': ['Tyler the Creator', 'Earl sweatshirt', 'Domo Genesis'],
+                    'Alternative': ['Childish Gambino', 'Flying Lotus'],
+                    'Death Row': ['Tupac Shakur', 'Snoop Dog', 'Dr. Dre']}
+        Eastcoast = {'Wu Tang': ['RZA', 'Ghostface Killa', "Ol' Dirty Basterd"],
+                     'Mock Southern': ['Bobby Shmurda', 'Di$igner'],
+                     'Old School Masters': ['Biggie', 'Big Pun', 'Diddy', 'JayZ']}
+        DirtySouth = {'Outkast': ['Andre3000', 'BigBoi'], 'New Atlanta': ['Young Thug', 'Future', 'Travi$ scott'],
+                      'Trap Lords': ['T.I', 'Young Jeezy', 'Gucci Maine']}
+        allDomains = {'Westcost': Westcost, 'Eastcoast': Eastcoast, 'DirtySouth': DirtySouth}
+        kindOfUsers = ['External', 'Regular', 'DomainAdmin']
+
+        for domain in allDomains:
+            api_session.AddNewDomain(domain)
+            index = 0
+            for group in allDomains[domain]:
+                api_session.AddNewGroup(group, '', kindOfUsers[index % 3])
+                api_session.AddGroupsToDomain(domain, [group])
+                index += 1
+                for user in allDomains[domain][group]:
+                    api_session.AddNewUser(user, 'admin', 'fake@quali.com', True)
+                    api_session.AddUsersToGroup([user], group)
+
+    def CreatevCenter(self,context,vmLocation,name='VMware vCenter'):
+
+        api_session = self._api_session(context)
+        attributes = {'User': 'Automation', 'Password': 'qs@L0cal', 'Default Datacenter': 'QualiSB',
+                      'VM Storage': 'eric ds cluster', 'Holding Network': 'Anetwork', 'VM Location': vmLocation,
+                      'Default dvSwitch': 'dvSwitch', 'VM Cluster': 'QualiSB Cluster', 'VM Resource Pool': 'LiverPool',
+                      'Shutdown Method': 'hard', 'Execution Server Selector': '',
+                      'OVF Tool Path': 'C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe',
+                      'Reserved Networks': ''}
+        family = 'Cloud Provider'
+        model = 'VMware vCenter'
+        address = '192.168.42.110'
+        driver = 'VCenter Shell Driver'
+        vcenter = api_session.CreateResource(family, model, name, address)
+        for attribute in attributes:
+            api_session.SetAttributeValue(vcenter.Name, attribute, attributes[attribute])
+        api_session.UpdateResourceDriver(name, driver)
+
+
+    def CreateManyReservations(self,context,topology, name=None, num=10, duration=5, delta=None,owner='admin',
+                               offset=0):
+
+        # cast input to appropriate type
+        num = int(num)
+        duration = int(duration)
+        offset = int(offset)
+        if delta == 'None':
+            delta = duration
+        if name == 'None':
+            name = topology
+
+        api_session = self._api_session(context)
+        offset *= 60
+        duration *= 60
+        delta *= 60
+        fail = 0
+        t = time.time() + offset
+        for i in range(num):
+            try:
+                res = api_session.CreateTopologyReservation(reservationName=name + '_' + str(i), owner=owner,
+                                                            startTime=self.FormatTime(t),
+                                                            endTime=self.FormatTime(t + duration), topologyFullPath=topology)
+            except CloudShellAPIError as e:
+                fail += 1
+                print str(i) + ': ' + self.FormatTime(t, time.localtime)
+
+            t += delta
+        if fail > 0:
+            print '%i function calls have failed' % fail
+            print e
+
+    def DeleteAllReservations(self,context):
+
+        api_session = self._api_session(context)
+        current_reservation_id = context.reservation.reservation_id
+        now = time.time()
+        for res in api_session.GetScheduledReservations(self.FormatTime(now), self.FormatTime(now + 604800)).Reservations:
+            if res.Id != current_reservation_id:
+                api_session.DeleteReservation(res.Id)
+
+    def CreateConnectedChassis(self,context,numberChassis=2, numberBlades=2, numberPorts=10, override=False, panelName='Panel',
+                               chassisName='Chassis', folderName='Chassis'):
+
+        # cast input to appropriate type
+        numberChassis = int(numberChassis)
+        numberBlades = int(numberBlades)
+        numberPorts = int(numberPorts)
+        override = override == 'True'
+
+        api_session = self._api_session(context)
+        safe_session = self._safe_session(context)
+        session = api_session
+        if override:
+            test = False
+            for item in api_session.GetFolderContent().ContentArray:
+                if item.Name == folderName and item.Type == 'Folder':
+                    test = True
+                    break
+            if test:
+                api_session.DeleteFolder(folderName)
+        else:
+            session = safe_session
+
+        api_session.CreateFolder(folderName)
+        panel = session.CreateResource('PatchPanel', 'Generic PatchPanel', resourceName=panelName,
+                                       resourceAddress='Panelia', folderFullPath=folderName)
+        api_session.UpdateResourceDriver(panel.Name, 'Patch Panel Driver')
+        for i in range(numberChassis):
+            chassis = session.CreateResource('Generic Chassis', 'Generic Chassis Model',
+                                             resourceName=chassisName + str(i + 1),
+                                             resourceAddress='Chassistan ' + str(i + 1), folderFullPath=folderName)
+            for j in range(numberBlades):
+                blade = api_session.CreateResource('Generic Blade', 'Generic Blade Model', 'Blade' + str(j + 1),
+                                                   'Bladnitrova ' + str(j + 1), folderName, chassis.Name)
+                for k in range(numberPorts):
+                    num = i * numberBlades * numberPorts + j * numberPorts + k + 1
+                    port = api_session.CreateResource('Generic Port', 'Generic Ethernet Port', 'Port' + str(k + 1),
+                                                      'Portlandia ' + str(k + 1), folderName, blade.Name)
+                    jack = api_session.CreateResource('Panel Jack', 'Generic Jack', 'Jack' + str(num),
+                                                      'Jackville ' + str(num),
+                                                      folderName, panel.Name)
+                    api_session.UpdatePhysicalConnection(port.Name, jack.Name)
+
+    def _api_session(self, context):
+        '''
+
         :param ResourceCommandContext context: the context the command runs on
-        """
-        pass
+        :rtype CloudShellAPISession
+        '''
+        return CloudShellAPISession(host=context.connectivity.server_address,
+                                    token_id=context.connectivity.admin_auth_token,
+                                    domain=context.reservation.domain)
 
-    def example_function_with_params(self, context, user_param1, user_param2):
-        """
-        An example function that accepts two user parameters
+    def _safe_session(self, context):
+        '''
+
         :param ResourceCommandContext context: the context the command runs on
-        :param str user_param1: A user parameter
-        :param str user_param2: A user parameter
-        """
-        pass
-
-    def _helper_function(self):
-        """
-        Private functions are always hidden, and will not be exposed to the end user
-        """
-        pass
-
-    # <editor-fold desc="Orchestration Save and Restore Standard">
-    def orchestration_save(self, context, cancellation_context, mode, custom_params=None):
-        """
-        Saves the Shell state and returns a description of the saved artifacts and information
-        This command is intended for API use only by sandbox orchestration scripts to implement
-        a save and restore workflow
-        :param ResourceCommandContext context: the context object containing resource and reservation info
-        :param CancellationContext cancellation_context: Object to signal a request for cancellation. Must be enabled in drivermetadata.xml as well
-        :param str mode: Snapshot save mode, can be one of two values 'shallow' (default) or 'deep'
-        :param str custom_params: Set of custom parameters for the save operation
-        :return: SavedResults serialized as JSON
-        :rtype: OrchestrationSaveResult
-        """
-
-        # See below an example implementation, here we use jsonpickle for serialization,
-        # to use this sample, you'll need to add jsonpickle to your requirements.txt file
-        # The JSON schema is defined at: https://github.com/QualiSystems/sandbox_orchestration_standard/blob/master/save%20%26%20restore/saved_artifact_info.schema.json
-        # You can find more information and examples examples in the spec document at https://github.com/QualiSystems/sandbox_orchestration_standard/blob/master/save%20%26%20restore/save%20%26%20restore%20standard.md
+        :rtype SafeCloudShellAPISession
         '''
-        # By convention, all dates should be UTC
-        created_date = datetime.datetime.utcnow()
 
-        # This can be any unique identifier which can later be used to retrieve the artifact
-        # such as filepath etc.
+        return SafeCloudShellAPISession(host=context.connectivity.server_address,
+                                        token_id=context.connectivity.admin_auth_token,
+                                        domain=context.reservation.domain)
 
-        # By convention, all dates should be UTC
-        created_date = datetime.datetime.utcnow()
-
-        # This can be any unique identifier which can later be used to retrieve the artifact
-        # such as filepath etc.
-        identifier = created_date.strftime('%y_%m_%d %H_%M_%S_%f')
-
-        orchestration_saved_artifact = OrchestrationSavedArtifact('REPLACE_WITH_ARTIFACT_TYPE', identifier)
-
-        saved_artifacts_info = OrchestrationSavedArtifactInfo(
-            resource_name="some_resource",
-            created_date=created_date,
-            restore_rules=OrchestrationRestoreRules(requires_same_resource=True),
-            saved_artifact=orchestration_saved_artifact)
-
-        return OrchestrationSaveResult(saved_artifacts_info)
-        '''
-        pass
-
-    def orchestration_restore(self, context, cancellation_context, saved_details):
-        """
-        Restores a saved artifact previously saved by this Shell driver using the orchestration_save function
-        :param ResourceCommandContext context: The context object for the command with resource and reservation info
-        :param CancellationContext cancellation_context: Object to signal a request for cancellation. Must be enabled in drivermetadata.xml as well
-        :param str saved_details: A JSON string representing the state to restore including saved artifacts and info
-        :return: None
-        """
-        '''
-        # The saved_details JSON will be defined according to the JSON Schema and is the same object returned via the
-        # orchestration save function.
-        # Example input:
-        # {
-        #     "saved_artifact": {
-        #      "artifact_type": "REPLACE_WITH_ARTIFACT_TYPE",
-        #      "identifier": "16_08_09 11_21_35_657000"
-        #     },
-        #     "resource_name": "some_resource",
-        #     "restore_rules": {
-        #      "requires_same_resource": true
-        #     },
-        #     "created_date": "2016-08-09T11:21:35.657000"
-        #    }
-
-        # The example code below just parses and prints the saved artifact identifier
-        saved_details_object = json.loads(saved_details)
-        return saved_details_object[u'saved_artifact'][u'identifier']
-        '''
-        pass
-
-    # </editor-fold>
+    def FormatTime(self, t, func=time.gmtime):
+        return time.strftime("%m/%d/%Y %H:%M", func(t))
 
 
-    # <editor-fold desc="Discovery">
-
-    def get_inventory(self, context):
-        """
-        Discovers the resource structure and attributes.
-        :param AutoLoadCommandContext context: the context the command runs on
-        :return Attribute and sub-resource information for the Shell resource you can return an AutoLoadDetails object
-        :rtype: AutoLoadDetails
-        """
-        # See below some example code demonstrating how to return the resource structure
-        # and attributes. In real life, of course, if the actual values are not static,
-        # this code would be preceded by some SNMP/other calls to get the actual resource information
-        '''
-           # Add sub resources details
-           sub_resources = [ AutoLoadResource(model ='Generic Chassis',name= 'Chassis 1', relative_address='1'),
-           AutoLoadResource(model='Generic Module',name= 'Module 1',relative_address= '1/1'),
-           AutoLoadResource(model='Generic Port',name= 'Port 1', relative_address='1/1/1'),
-           AutoLoadResource(model='Generic Port', name='Port 2', relative_address='1/1/2'),
-           AutoLoadResource(model='Generic Power Port', name='Power Port', relative_address='1/PP1')]
 
 
-           attributes = [ AutoLoadAttribute(relative_address='', attribute_name='Location', attribute_value='Santa Clara Lab'),
-                          AutoLoadAttribute('', 'Model', 'Catalyst 3850'),
-                          AutoLoadAttribute('', 'Vendor', 'Cisco'),
-                          AutoLoadAttribute('1', 'Serial Number', 'JAE053002JD'),
-                          AutoLoadAttribute('1', 'Model', 'WS-X4232-GB-RJ'),
-                          AutoLoadAttribute('1/1', 'Model', 'WS-X4233-GB-EJ'),
-                          AutoLoadAttribute('1/1', 'Serial Number', 'RVE056702UD'),
-                          AutoLoadAttribute('1/1/1', 'MAC Address', 'fe80::e10c:f055:f7f1:bb7t16'),
-                          AutoLoadAttribute('1/1/1', 'IPv4 Address', '192.168.10.7'),
-                          AutoLoadAttribute('1/1/2', 'MAC Address', 'te67::e40c:g755:f55y:gh7w36'),
-                          AutoLoadAttribute('1/1/2', 'IPv4 Address', '192.168.10.9'),
-                          AutoLoadAttribute('1/PP1', 'Model', 'WS-X4232-GB-RJ'),
-                          AutoLoadAttribute('1/PP1', 'Port Description', 'Power'),
-                          AutoLoadAttribute('1/PP1', 'Serial Number', 'RVE056702UD')]
 
-           return AutoLoadDetails(sub_resources,attributes)
-        '''
-        pass
-
-    # </editor-fold>
-
-
-    # <editor-fold desc="Health Check">
-
-    def health_check(self, cancellation_context):
-        """
-        Checks if the device is up and connectable
-        :return: None
-        :exception Exception: Raises an error if cannot connect
-        """
-        pass
-
-    # </editor-fold>
-
-
-    def cleanup(self):
-        """
-        Destroy the driver session, this function is called everytime a driver instance is destroyed
-        This is a good place to close any open sessions, finish writing to log files
-        """
-        pass

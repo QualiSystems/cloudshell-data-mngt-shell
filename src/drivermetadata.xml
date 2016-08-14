@@ -1,35 +1,91 @@
-<Driver Description="Describe the purpose of your CloudShell shell" MainClass="driver.CloudshellDataMngtShellDriver" Name="CloudshellDataMngtShellDriver" Version="1.0.0">
-    <Layout>
-        <Category Name="App Management">
-            <Command Description="Just your regular example command" DisplayName="Example Command" Name="example_function" />
-            <Command Description="Just your regular example command with parameters" DisplayName="Command With Params"
-                     Name="example_function_with_params" >
+<Driver Description="Describe the purpose of your CloudShell shell" MainClass="driver.QaTestingScriptsDriver" Name="QaTestingScriptsDriver" Version="1.0.0">
+ <Layout>
+        <Category Name="Database Building">
+            <Command Description="This command creates chassis with blades and ports all connected to each other" DisplayName="Create Connected Chassis" Name="CreateConnectedChassis" >
                 <Parameters>
-                    <Parameter Name="user_param1" Type="String" Mandatory = "True" DefaultValue="Somem default"
-                               DisplayName="String Param" Description="Some example string input"/>
-                    <Parameter Name="user_param2" Type="Lookup" Mandatory = "True" AllowedValues="Yes,No"
-                               DefaultValue="Yes" DisplayName="Lookup Param" Description="Some example lookup input"/>
+                        <Parameter Name="numberChassis"  Mandatory = "False"
+                                   DisplayName="Number of Chassis" Description="The number of chassis you want to create" DefaultValue="2"/>
+                        <Parameter Name="numberBlades"  Mandatory = "False"
+                                   DisplayName="Number of Blades" Description="The number of blades per chassis you want to create" DefaultValue="2"/>
+                        <Parameter Name="numberPorts"  Mandatory = "False"
+                                   DisplayName="Number of Blades" Description="The number of ports per Blade you want to create" DefaultValue="10"/>
+                        <Parameter Name="chassisName"  Mandatory = "False"
+                                   DisplayName="Chassis Name" Description="The base Name for chassis tou want to create" DefaultValue="Chassis"/>
+                        <Parameter Name="panelName"  Mandatory = "False"
+                                   DisplayName="Panel Name" Description="The Name of the panel you want to create" DefaultValue="Panel"/>
+                        <Parameter Name="folderName"  Mandatory = "False"
+                                   DisplayName="Folder Name" Description="The Name of the folder were resources will be created" DefaultValue="Chassis"/>
+                        <Parameter Name="override"  Mandatory = "False" Type="Lookup" AllowedValues="True,False"
+                                   DisplayName="Override" Description="Will the function override existing folder or create resources with names that won't clash with existing resources " DefaultValue="False"/>
+                    </Parameters>
+            </Command>
+            <Command Description="This command creates bridges with ports all connected to each other" DisplayName="Create Connected Bridges" Name="CreateConnectedBridges" >
+                <Parameters>
+                        <Parameter Name="numberBridges"  Mandatory = "False"
+                                   DisplayName="Number of Bridges" Description="The number of Bridges you want to create" DefaultValue="2"/>
+                        <Parameter Name="numberPorts"  Mandatory = "False"
+                                   DisplayName="Number of Blades" Description="The number of ports per bridge you want to create" DefaultValue="10"/>
+                        <Parameter Name="bridgeName"  Mandatory = "False"
+                                   DisplayName="Chassis Name" Description="The base Name for the bridges you want to create" DefaultValue="Bridge"/>
+                        <Parameter Name="panelName"  Mandatory = "False"
+                                   DisplayName="Panel Name" Description="The Name of the panel you want to create" DefaultValue="The Panel"/>
+                        <Parameter Name="folderName"  Mandatory = "False"
+                                   DisplayName="Folder Name" Description="The Name of the folder were resources will be created" DefaultValue="Bridges"/>
+                        <Parameter Name="override"  Mandatory = "False" Type="Lookup" AllowedValues="True,False"
+                                   DisplayName="Override" Description="Will the function override existing folder or create resources with names that won't clash with existing resources " DefaultValue="False"/>
+                    </Parameters>
+            </Command>
+            <Command Description="Create users of different permissions and different groups and domains" DisplayName="Create Users" Name="CreateUsers"/>
+            <Command Description="Creates a fully configured vCenter that is ready for use" DisplayName="Create vCenter" Name="CreatevCenter" >
+                <Parameters>
+                    <Parameter Name="name" Mandatory = "False" DisplayName="Vcenter Name" Description="the name of the vCenter" DefaultValue="VMware vCenter" />
+                    <Parameter Name="vmLocation" Mandatory = "True" DisplayName="VM Location" Description="the folder on the vsphere on which you want the VM to be formed" />
                 </Parameters>
             </Command>
+            <Command Description="Creates a topology with specified number of apps" DisplayName="Create Topology with Many Apps" Name="CreateTopologyWithNApps" >
+                <Parameters>
+                        <Parameter Name="n"  Mandatory = "True"
+                                   DisplayName="Number of Apps" Description="The number of apps you want in your topology" />
+                        <Parameter Name="topology_name"  Mandatory = "True"
+                                   DisplayName="Topology Name" Description="The name of created topology"/>
+                        <Parameter Name="app_name"  Mandatory = "True"
+                                   DisplayName="App Name" Description="The name of the app you wnt to add to topology"/>
+                    </Parameters>
+            </Command>
+        </Category>
+        <Category Name="Reservation Management">
+             <Command Description="Ends all active reservations except this one" DisplayName="End all Resevations" Name="KillAllReservations"/>
+             <Command Description="Deletes all reservations from now until next week excluding this one" DisplayName="Delete all Resevations" Name="DeleteAllReservations"/>
+             <Command Description="This command creates many consecutive resevations from a topology" DisplayName="Create Many Reservations" Name="CreateManyReservations" >
+                <Parameters>
+                        <Parameter Name="topology"  Mandatory = "True"
+                                   DisplayName="Topology" Description="The topology from which you wish to create reservations" />
+                        <Parameter Name="name"  Mandatory = "False"
+                                   DisplayName="Name of reservations" Description="If left as None the name of reservations will be the same as topology" DefaultValue="None"/>
+                        <Parameter Name="num"  Mandatory = "False"
+                                   DisplayName="Number of Reservations" Description="The number of reservations to create" DefaultValue="10"/>
+                        <Parameter Name="duration"  Mandatory = "False"
+                                   DisplayName="Duration" Description="The duration of created resevations in minutes" DefaultValue="5"/>
+                        <Parameter Name="delta"  Mandatory = "False"
+                                   DisplayName="Delta" Description="The time between the beginnings of consecutive reservations in minutes, if left None it will be equal to duration" DefaultValue="None"/>
+                        <Parameter Name="owner"  Mandatory = "False"
+                                   DisplayName="Owner" Description="the user from which these reservations are created" DefaultValue="admin"/>
+                        <Parameter Name="offset" Mandatory="False" DisplayName="Start Time" Description="The time from now when first reservation will be created"
+                                   DefaultValue="0"/>
+                    </Parameters>
+            </Command>
+             <Command Description="Removes all resources from given reservation" DisplayName="Remove All Resources" Name="RemoveAllResources" >
+                <Parameters>
+                        <Parameter Name="res_id"  Mandatory = "True"
+                                   DisplayName="Reservation ID" Description="The ID of reservation from which you want to remove resources"/>
+                 </Parameters>
+            </Command>
+
         </Category>
         <Category Name="Hidden Commands">
-            <Command Name="health_check"  Tags="" Description="Checks if the device is up and connectable"/>
-            <Command Name="orchestration_save" >
-                <Parameters>
-                    <Parameter Name="mode" Type="Lookup" Mandatory = "True" AllowedValues="shallow,deep"  DefaultValue="shallow"
-                               Description="Snapshot save mode, can be one of two values 'shallow' (default) or 'deep'"/>
-                    <Parameter Name="custom_params" Type="String" Mandatory = "False"  DefaultValue=""
-                               Description=" Set of custom parameters for the save operation"/>
-
-                </Parameters>
-            </Command>
-            <Command Name="orchestration_restore" >
-                <Parameters>
-                    <Parameter Name="saved_details" Type="String" Mandatory = "True" DefaultValue=""
-                               Description="A JSON string representing the state to restore including saved artifacts and info"/>
-                </Parameters>
-            </Command>
+            <Command Description="An API only function" DisplayName="Matters Not" Name="_api_session" />
+            <Command Description="An API only function" DisplayName="Matters Not" Name="_safe_session" />
+            <Command Description="An API only function" DisplayName="Matters Not" Name="FormatTime" />
         </Category>
-
     </Layout>
-</Driver>
+ </Driver>

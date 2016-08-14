@@ -1,245 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<DataModelInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd">
+<DataModelInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd">
   <Attributes>
-    <AttributeInfo Name="User" Type="String" DefaultValue="" IsReadOnly="false">
+    <AttributeInfo Name="UniqueID" Type="String" DefaultValue="" IsReadOnly="false">
       <Rules>
         <Rule Name="Configuration" />
       </Rules>
     </AttributeInfo>
-    <AttributeInfo Name="Password" Type="Password" DefaultValue="3M3u7nkDzxWb0aJ/IZYeWw==" IsReadOnly="false">
+    <AttributeInfo Name="Number of Ports" Type="Numeric" DefaultValue="0" IsReadOnly="false">
+      <Rules />
+    </AttributeInfo>
+    <AttributeInfo xsi:type="LookupAttributeDetails" Name="Protocol Type" Type="Lookup" DefaultValue="Transparent" IsReadOnly="false">
       <Rules>
         <Rule Name="Configuration" />
+        <Rule Name="Constant Capability" />
       </Rules>
+      <LookupValues>
+        <LookupValue NumericValue="0" StringValue="Transparent" />
+        <LookupValue NumericValue="1" StringValue="Fibre Channel" />
+        <LookupValue NumericValue="2" StringValue="Ethernet" />
+        <LookupValue NumericValue="3" StringValue="SONET" />
+        <LookupValue NumericValue="4" StringValue="10G Ethernet" />
+        <LookupValue NumericValue="5" StringValue="Infiniband" />
+        <LookupValue NumericValue="6" StringValue="T-Carrier" />
+        <LookupValue NumericValue="7" StringValue="E-Carrier" />
+      </LookupValues>
     </AttributeInfo>
-    <AttributeInfo Name="Enable Password" Type="Password" DefaultValue="3M3u7nkDzxWb0aJ/IZYeWw==" IsReadOnly="false"
-       Description="The Enable password is required by some CLI protocols such as Telnet">
+    <AttributeInfo xsi:type="LookupAttributeDetails" Name="Speed" Type="Lookup" DefaultValue="10 Mbps" IsReadOnly="false" IsCommand="true">
       <Rules>
-        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+        <Rule Name="Variable Capability" />
       </Rules>
+      <LookupValues>
+        <LookupValue NumericValue="2" StringValue="10 Mbps" />
+        <LookupValue NumericValue="3" StringValue="100 Mbps" />
+        <LookupValue NumericValue="4" StringValue="1 Gbps" />
+        <LookupValue NumericValue="5" StringValue="10 Gbps" />
+        <LookupValue NumericValue="6" StringValue="1 Gbps CU" />
+        <LookupValue NumericValue="11" StringValue="1 Gbps Fiber" />
+        <LookupValue NumericValue="12" StringValue="2 Gbps Fiber" />
+        <LookupValue NumericValue="13" StringValue="4 Gbps Fiber" />
+        <LookupValue NumericValue="14" StringValue="8 Gbps Fiber" />
+        <LookupValue NumericValue="15" StringValue="10 Gbps Fiber Serial" />
+        <LookupValue NumericValue="21" StringValue="2.5 Gbps Sonnet" />
+        <LookupValue NumericValue="22" StringValue="10 Gbps Sonnet" />
+        <LookupValue NumericValue="31" StringValue="2.5 Gbps Infiniband" />
+        <LookupValue NumericValue="32" StringValue="10 Gbps Infiniband" />
+        <LookupValue NumericValue="41" StringValue="200 Mbps ESCON/SBCON" />
+      </LookupValues>
     </AttributeInfo>
-    <AttributeInfo Name="Power Management" Type="Boolean" DefaultValue="False" IsReadOnly="false"
-       Description="Used by the power management orchestration, if enabled, to determine whether to automatically manage the device power status">
+    <AttributeInfo xsi:type="LookupAttributeDetails" Name="Autoneg Capability" Type="Lookup" DefaultValue="10 Mbps HD" IsReadOnly="false">
       <Rules>
-        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+        <Rule Name="Variable Capability" />
       </Rules>
+      <LookupValues>
+        <LookupValue NumericValue="34" StringValue="10 Mbps HD" />
+        <LookupValue NumericValue="35" StringValue="10 Mbps FD" />
+        <LookupValue NumericValue="50" StringValue="100 Mbps HD" />
+        <LookupValue NumericValue="51" StringValue="100 Mbps FD" />
+        <LookupValue NumericValue="67" StringValue="1 Gbps FD" />
+        <LookupValue NumericValue="99" StringValue="10 Gbps FD" />
+      </LookupValues>
     </AttributeInfo>
-    <AttributeInfo Name="System Name" Type="String" DefaultValue="" IsReadOnly="true"
-      Description="A unique identifier for the device, if exists in the device terminal/os  ">
-      <Rules Override="false">
-	     <Rule Name="Setting" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="Port Description" Type="String" DefaultValue="" IsReadOnly="true">
-      <Rules Override="false">
-	     <Rule Name="Setting" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="Port Speed" Type="String" DefaultValue="" IsReadOnly="true"
-      Description="The port speed (e.g 10Gb/s, 40Gb/s, 100Mb/s)">
-      <Rules Override="false">
-       <Rule Name="Setting" />
-       <Rule Name="Available For Abstract Resources" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="Version" Type="String" DefaultValue="" IsReadOnly="true">
-      <Rules Override="false">
-	     <Rule Name="Setting" />
-	     <Rule Name="Available For Abstract Resources" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="Vendor" Type="String" DefaultValue="" IsReadOnly="true">
-      <Rules Override="false">
-	     <Rule Name="Setting" />
-        <Rule Name="Displayed In Search Filter"/>
-	     <Rule Name="Available For Abstract Resources" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="Location" Type="String" DefaultValue="" IsReadOnly="true"
-      Description="The device physical location identifier. For example: Lab1/Floor2/Row5/Slot4">
-      <Rules Override="false">
-	     <Rule Name="Setting" />
-	     <Rule Name="Available For Abstract Resources" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="Backup Location" Type="String" DefaultValue="" IsReadOnly="false"
-      Description="Used by the save/restore orchestration to determine where backups should be saved">
+    <AttributeInfo xsi:type="LookupAttributeDetails" Name="Duplex" Type="Lookup" DefaultValue="Full" IsReadOnly="false" IsCommand="true">
       <Rules>
-        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+        <Rule Name="Variable Capability" />
       </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="Model" Type="String" DefaultValue="" IsReadOnly="true"
-      Description="The device model. This information is typically used for abstract resource filtering.">
-      <Rules Override="false">
-      	<Rule Name="Setting" />
-        <Rule Name="Displayed In Search Filter"/>
-	       <Rule Name="Available For Abstract Resources" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="SNMP Read Community" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="SNMP Write Community" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="SNMP V3 Password" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="SNMP V3 Private Key" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="SNMP V3 User" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="SNMP Version" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="Sessions Concurrency Limit" Type="Numeric" DefaultValue="1" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="Console Server IP Address" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="Console User" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="Console Password" Type="Password" DefaultValue="3M3u7nkDzxWb0aJ/IZYeWw==" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="Console Port" Type="Numeric" DefaultValue="0" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo xsi:type="LookupAttributeDetails" Name="CLI Connection Type" Type="Lookup" DefaultValue="Auto" IsReadOnly="false" IsCommand="false">
-      <Rules>
-        <Rule Name="Configuration" />
-      </Rules>
-            <LookupValues>
-                <LookupValue NumericValue="0" StringValue="Auto"/>
-                <LookupValue NumericValue="1" StringValue="Console"/>
-                <LookupValue NumericValue="2" StringValue="SSH"/>
-                <LookupValue NumericValue="3" StringValue="Telnet"/>
-                <LookupValue NumericValue="4" StringValue="TCP"/>
-            </LookupValues>
-        </AttributeInfo>
-    <AttributeInfo Name="Serial Number" Type="String" DefaultValue="" IsReadOnly="true">
-      <Rules Override="false">
-	     <Rule Name="Setting" />
-	     <Rule Name="Available For Abstract Resources" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="MAC Address" Type="String" DefaultValue="" IsReadOnly="true">
-      <Rules Override="false">
-	     <Rule Name="Setting" />
-	     <Rule Name="Available For Abstract Resources" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="IPv4 Address" Type="String" DefaultValue="" IsReadOnly="true">
-      <Rules Override="false">
-	     <Rule Name="Setting" />
-	     <Rule Name="Available For Abstract Resources" />
-      </Rules>
-    </AttributeInfo>
-    <AttributeInfo Name="IPv6 Address" Type="String" DefaultValue="" IsReadOnly="true">
-      <Rules Override="false">
-	     <Rule Name="Setting" />
-	     <Rule Name="Available For Abstract Resources" />
-      </Rules>
+      <LookupValues>
+        <LookupValue NumericValue="2" StringValue="Half" />
+        <LookupValue NumericValue="3" StringValue="Full" />
+      </LookupValues>
     </AttributeInfo>
   </Attributes>
   <ResourceFamilies>
-    <ResourceFamily Name="Generic Resource" IsConnectable="false" IsLockedByDefault="true" Description="" IsSearchable="true" ResourceType="Resource">
+    <ResourceFamily Name="Generic Chassis" ImagePath="Generic Chassis_Family.png" IsSearchable="true" ResourceType="Resource">
       <AttachedAttributes>
+        <AttachedAttribute Name="UniqueID" IsOverridable="true" IsLocal="true">
+          <AllowedValues />
+        </AttachedAttribute>
       </AttachedAttributes>
       <AttributeValues>
+        <AttributeValue Name="UniqueID" Value="" />
       </AttributeValues>
       <Models>
+        <ResourceModel Name="Generic Chassis Model" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues>
+            <AttributeValue Name="UniqueID" Value="" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers />
+          <Scripts />
+        </ResourceModel>
       </Models>
       <Categories />
     </ResourceFamily>
-    <ResourceFamily Name="Port" IsSearchable="true" IsConnectable="true" IsLockedByDefault="true">
-      <AttachedAttributes />
-      <AttributeValues />
+    <ResourceFamily Name="Generic Blade" ImagePath="Generic Blade_Family.png" IsSearchable="true" ResourceType="Resource">
+      <AttachedAttributes>
+        <AttachedAttribute Name="UniqueID" IsOverridable="true" IsLocal="true">
+          <AllowedValues />
+        </AttachedAttribute>
+      </AttachedAttributes>
+      <AttributeValues>
+        <AttributeValue Name="UniqueID" Value="" />
+      </AttributeValues>
       <Models>
-       <ResourceModel Name="Resource Port" Description="" SupportsConcurrentCommands="false">
-         <AttachedAttributes>
-           <AttachedAttribute Name="MAC Address" IsOverridable="true" IsLocal="true">
-             <AllowedValues />
-           </AttachedAttribute>
-           <AttachedAttribute Name="IPv4 Address" IsOverridable="true" IsLocal="true">
-             <AllowedValues />
-           </AttachedAttribute>
-           <AttachedAttribute Name="IPv6 Address" IsOverridable="true" IsLocal="true">
-             <AllowedValues />
-           </AttachedAttribute>
-           <AttachedAttribute Name="Port Speed" IsOverridable="true" IsLocal="true">
-             <AllowedValues />
-           </AttachedAttribute>
-
-         </AttachedAttributes>
-         <AttributeValues>
-           <AttributeValue Name="MAC Address" Value="" />
-           <AttributeValue Name="IPv4 Address" Value="" />
-           <AttributeValue Name="IPv6 Address" Value="" />
-           <AttributeValue Name="Port Speed" Value="" />
-
-         </AttributeValues>
-     <ParentModels>
-       <ParentModelName>CloudshellDataMngtShell</ParentModelName>
-     </ParentModels>
-     <Drivers />
-     <Scripts />
-       </ResourceModel>
-     </Models>
-     <Categories />
-   </ResourceFamily>
-   <ResourceFamily Name="Power Port" IsConnectable="true" IsLockedByDefault="true" Description="" IsSearchable="true">
-        <AttachedAttributes />
-		<AttributeValues />
-		<Models>
-        <ResourceModel Name="Generic Power Port" Description="" SupportsConcurrentCommands="false">
-		<AttachedAttributes>
-            <AttachedAttribute Name="Model" IsOverridable="true" IsLocal="true">
-              <AllowedValues />
-            </AttachedAttribute>
-            <AttachedAttribute Name="Serial Number" IsOverridable="true" IsLocal="true">
-              <AllowedValues />
-            </AttachedAttribute>
-            <AttachedAttribute Name="Version" IsOverridable="true" IsLocal="true">
-              <AllowedValues />
-            </AttachedAttribute>
-            <AttachedAttribute Name="Port Description" IsOverridable="true" IsLocal="true">
-              <AllowedValues />
-            </AttachedAttribute>
-        </AttachedAttributes>
-        <AttributeValues>
-            <AttributeValue Name="Model" Value="" />
-            <AttributeValue Name="Serial Number" Value="" />
-	    <AttributeValue Name="Version" Value="" />
-            <AttributeValue Name="Port Description" Value="" />
-        </AttributeValues>
-	    <ParentModels>
-            <ParentModelName>CloudshellDataMngtShell</ParentModelName>
+        <ResourceModel Name="Generic Blade Model" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues>
+            <AttributeValue Name="UniqueID" Value="" />
+          </AttributeValues>
+          <ParentModels>
+            <ParentModelName>Generic Chassis Model</ParentModelName>
           </ParentModels>
           <Drivers />
           <Scripts />
@@ -247,8 +120,200 @@
       </Models>
       <Categories />
     </ResourceFamily>
+    <ResourceFamily Name="Generic Port" IsConnectable="true" IsLockedByDefault="true" ImagePath="Generic Port_Family.png" IsSearchable="true" ResourceType="Resource">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="Generic Ethernet Port" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+            <AttachedAttribute Name="Protocol Type" IsOverridable="true" IsLocal="true">
+              <AllowedValues>
+                <AllowedValue>Ethernet</AllowedValue>
+                <AllowedValue>10G Ethernet</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="Speed" IsOverridable="true" IsLocal="true">
+              <AllowedValues>
+                <AllowedValue>10 Mbps</AllowedValue>
+                <AllowedValue>100 Mbps</AllowedValue>
+                <AllowedValue>1 Gbps</AllowedValue>
+                <AllowedValue>10 Gbps</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="Autoneg Capability" IsOverridable="true" IsLocal="true">
+              <AllowedValues>
+                <AllowedValue>10 Mbps HD</AllowedValue>
+                <AllowedValue>10 Mbps FD</AllowedValue>
+                <AllowedValue>100 Mbps HD</AllowedValue>
+                <AllowedValue>100 Mbps FD</AllowedValue>
+                <AllowedValue>1 Gbps FD</AllowedValue>
+                <AllowedValue>10 Gbps FD</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="Duplex" IsOverridable="true" IsLocal="true">
+              <AllowedValues>
+                <AllowedValue>Half</AllowedValue>
+                <AllowedValue>Full</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="Protocol Type" Value="Ethernet" />
+            <AttributeValue Name="Speed" Value="1 Gbps" />
+            <AttributeValue Name="Autoneg Capability" Value="1 Gbps FD" />
+            <AttributeValue Name="Duplex" Value="Full" />
+          </AttributeValues>
+          <ParentModels>
+            <ParentModelName>Generic Blade Model</ParentModelName>
+          </ParentModels>
+          <Drivers />
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories />
+    </ResourceFamily>
+    <ResourceFamily Name="Bridge" ImagePath="Bridge_Family.png" Description="" IsSearchable="true" ResourceType="Resource">
+      <AttachedAttributes>
+        <AttachedAttribute Name="Number of Ports" IsOverridable="true" IsLocal="false">
+          <AllowedValues />
+        </AttachedAttribute>
+      </AttachedAttributes>
+      <AttributeValues>
+        <AttributeValue Name="Number of Ports" Value="0" />
+      </AttributeValues>
+      <Models>
+        <ResourceModel Name="Bridge Generic Model" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues>
+            <AttributeValue Name="Number of Ports" Value="0" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers />
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories />
+    </ResourceFamily>
+    <ResourceFamily Name="Bridge Port" IsConnectable="true" IsLockedByDefault="true" ImagePath="Bridge Port_Family.png" Description="" IsSearchable="true" ResourceType="Resource">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="Bridge Port Generic Model" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+            <AttachedAttribute Name="Protocol Type" IsOverridable="true" IsLocal="true">
+              <AllowedValues>
+                <AllowedValue>Transparent</AllowedValue>
+                <AllowedValue>Fibre Channel</AllowedValue>
+                <AllowedValue>Ethernet</AllowedValue>
+                <AllowedValue>SONET</AllowedValue>
+                <AllowedValue>10G Ethernet</AllowedValue>
+                <AllowedValue>Infiniband</AllowedValue>
+                <AllowedValue>T-Carrier</AllowedValue>
+                <AllowedValue>E-Carrier</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="Speed" IsOverridable="true" IsLocal="true">
+              <AllowedValues>
+                <AllowedValue>10 Mbps</AllowedValue>
+                <AllowedValue>100 Mbps</AllowedValue>
+                <AllowedValue>1 Gbps</AllowedValue>
+                <AllowedValue>10 Gbps</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="Autoneg Capability" IsOverridable="true" IsLocal="true">
+              <AllowedValues>
+                <AllowedValue>10 Mbps HD</AllowedValue>
+                <AllowedValue>10 Mbps FD</AllowedValue>
+                <AllowedValue>100 Mbps HD</AllowedValue>
+                <AllowedValue>100 Mbps FD</AllowedValue>
+                <AllowedValue>1 Gbps FD</AllowedValue>
+                <AllowedValue>10 Gbps FD</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="Duplex" IsOverridable="true" IsLocal="true">
+              <AllowedValues>
+                <AllowedValue>Half</AllowedValue>
+                <AllowedValue>Full</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="Protocol Type" Value="Transparent" />
+            <AttributeValue Name="Speed" Value="1 Gbps" />
+            <AttributeValue Name="Autoneg Capability" Value="1 Gbps FD" />
+            <AttributeValue Name="Duplex" Value="Full" />
+          </AttributeValues>
+          <ParentModels>
+            <ParentModelName>Bridge Generic Model</ParentModelName>
+          </ParentModels>
+          <Drivers />
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories />
+    </ResourceFamily>
+    <ResourceFamily Name="PatchPanel" IsMappableContainer="true" ImagePath="PatchPanel_Family.png" Description="" SupportsMulticastMapping="true" SupportsLoopbackMapping="true" IsSearchable="true" ResourceType="Resource">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="Generic PatchPanel" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues />
+          <ParentModels />
+          <Drivers>
+            <DriverName>Patch Panel Driver</DriverName>
+          </Drivers>
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories />
+    </ResourceFamily>
+    <ResourceFamily Name="Panel Jack" IsMappable="true" IsConnectable="true" IsLockedByDefault="true" ImagePath="Panel Jack_Family.png" Description="" IsSearchable="true" ResourceType="Resource">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="Generic Jack" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+            <AttachedAttribute Name="Protocol Type" IsOverridable="true" IsLocal="false">
+              <AllowedValues>
+                <AllowedValue>Transparent</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="Protocol Type" Value="Transparent" />
+          </AttributeValues>
+          <ParentModels>
+            <ParentModelName>Generic PatchPanel</ParentModelName>
+          </ParentModels>
+          <Drivers />
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories />
+    </ResourceFamily>
+    <ResourceFamily Name="QA Scripts" ImagePath="QA Scripts_Family.png" Description="" IsService="true" ServiceType="Regular">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="QA scripts Service" ImagePath="QA scripts Service_Model.png" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues />
+          <ParentModels />
+          <Drivers>
+            <DriverName>QAdriver</DriverName>
+          </Drivers>
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories>
+        <Category>Qualisystem Helpers</Category>
+      </Categories>
+    </ResourceFamily>
   </ResourceFamilies>
   <DriverDescriptors>
-      <DriverDescriptor Name="CloudshellDataMngtShellDriver" DriverType="PythonDriver" />
+    <DriverDescriptor Name="QAdriver" Description="Describe the purpose of your CloudShell shell" DriverType="PythonDriver" />
+    <DriverDescriptor Name="Patch Panel Driver" DriverType="L1SwitchDriver" />
   </DriverDescriptors>
+  <ScriptDescriptors />
 </DataModelInfo>
